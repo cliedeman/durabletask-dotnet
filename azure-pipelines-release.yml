@@ -13,7 +13,7 @@ parameters:
   type: boolean
   default: false
 - name: sign
-  displayName: Sign Outputs
+  displayName: Sign outputs
   type: boolean
   default: true
 
