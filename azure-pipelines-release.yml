@@ -12,13 +12,16 @@ parameters:
   displayName: MSBuild binary log
   type: boolean
   default: false
+- name: sign
+  displayName: Sign Outputs
+  type: boolean
+  default: true
 
 variables:
   project: 'src/dirs.proj'
   bin_dir: 'out/bin'
   log_dir: 'out/log'
   pkg_dir: 'out/pkg'
-  build_args: -c release -p:FileVersionRevision=$(Build.BuildId) -p:ContinuousIntegrationBuild=true
   ${{ if parameters.binlog }}:
     build_binlog: -bl:$(log_dir)/build.binlog
     pack_binlog: -bl:$(log_dir)/pack.binlog
@@ -49,13 +52,14 @@ steps:
   displayName: Build
   inputs:
     command: build
-    arguments: --no-restore $(build_args) $(build_binlog)
+    arguments: --no-restore -c release $(build_binlog)
     projects: $(project)
 
 # Authenticode sign all the DLLs with the Microsoft certificate.
 # This appears to be an in-place signing job, which is convenient.
 - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@2
   displayName: 'ESRP CodeSigning: Authenticode'
+  condition: eq(parameters.sign, true)
   inputs:
     ConnectedServiceName: 'ESRP Service'
     FolderPath: $(bin_dir)
@@ -98,13 +102,14 @@ steps:
   inputs:
     command: custom
     custom: pack
-    arguments: --no-build $(build_args) $(pack_binlog)
+    arguments: --no-build -c release $(pack_binlog)
     projects: $(project)
 
 # Digitally sign all the nuget packages with the Microsoft certificate.
 # This appears to be an in-place signing job, which is convenient.
 - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@2
   displayName: 'ESRP CodeSigning: Nupkg'
+  condition: eq(parameters.sign, true)
   inputs:
     ConnectedServiceName: 'ESRP Service'
     FolderPath: $(pkg_dir)

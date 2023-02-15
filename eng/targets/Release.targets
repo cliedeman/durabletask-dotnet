@@ -41,4 +41,9 @@ $(PackageReleaseNotes)
     </PropertyGroup>
   </Target>
 
+  <Target Name="SetCloudBuildVersion" DependsOnTargets="SetAzureDevopsBuildVersion" />
+  <Target Name="SetAzureDevopsBuildVersion" Condition="'$(SYSTEM_TEAMPROJECTID)' != ''">
+    <Message Text="##vso[build.updatebuildnumber]v$(Version)" Importance="high" />
+  </Target>
+
 </Project>

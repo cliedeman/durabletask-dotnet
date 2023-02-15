@@ -17,7 +17,32 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <CloudProvider Condition="'$(SYSTEM_TEAMPROJECTID)' != ''">AzureDevOps</CloudProvider>
+    <CloudProvider Condition="'$(GITHUB_ACTIONS)' == 'true'">GithubActions</CloudProvider>
+    <BuildingRef Condition="'$(CloudProvider)' == 'AzureDevOps'">$(BUILD_SOURCEBRANCH)</BuildingRef>
+    <BuildingRef Condition="'$(CloudProvider)' == 'GithubActions'">$(GITHUB_REF)</BuildingRef>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(CloudProvider)' == 'AzureDevOps'">
+    <FileVersionRevision>$(BUILD_BUILDID)</FileVersionRevision>
+    <BuildingRef>$(BUILD_SOURCEBRANCH)</BuildingRef>
+    <GitCommitShort>$(BUILD_SOURCEVERSION.Substring(0, 10))</GitCommitShort>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(CloudProvider)' == 'GithubActions'">
+    <FileVersionRevision>$(GITHUB_RUN_NUMBER)</FileVersionRevision>
+    <BuildingRef>$(GITHUB_REF)</BuildingRef>
+    <GitCommitShort>$(GITHUB_SHA.Substring(0, 10))</GitCommitShort>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(CloudProvider)' != ''">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <VersionPrefix>1.0.1</VersionPrefix>
+    <VersionSuffix Condition="'$(BuildingRef)' != '' and !$(BuildingRef.StartsWith('refs/heads/main'))">alpha+$(GitCommitShort)</VersionSuffix>
+    <VersionSuffix Condition="'$(CloudProvider)' == ''">local</VersionSuffix>
   </PropertyGroup>
 
 </Project>
