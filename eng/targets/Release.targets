@@ -43,7 +43,7 @@ $(PackageReleaseNotes)
 
   <Target Name="SetCloudBuildVersion" DependsOnTargets="SetAzureDevopsBuildVersion" BeforeTargets="CoreCompile" />
   <Target Name="SetAzureDevopsBuildVersion" Condition="'$(SYSTEM_TEAMPROJECTID)' != ''">
-    <Message Text="##vso[build.updatebuildnumber]v$(Version)" Importance="high" />
+    <Message Text="##vso[build.updatebuildnumber]$(Version)" Importance="high" />
   </Target>
 
 </Project>

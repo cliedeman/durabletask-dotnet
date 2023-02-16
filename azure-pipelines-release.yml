@@ -8,11 +8,11 @@ pool:
     - ImageOverride -equals MMS2022TLS
 
 parameters:
-- name: binlog
+- name: binlog # https://msbuildlog.com - useful for build investigations
   displayName: MSBuild binary log
   type: boolean
   default: false
-- name: sign
+- name: sign # allow us to skip signing when testing build def changes
   displayName: Sign outputs
   type: boolean
   default: true
@@ -138,6 +138,7 @@ steps:
   displayName: 'Publish packages to Artifacts'
   artifact: pkg
 
-- publish: $(log_dir)
-  displayName: 'Publish logs to Artifacts'
-  artifact: log
+- ${{ if parameters.binlog }}:
+  - publish: $(log_dir)
+    displayName: 'Publish logs to Artifacts'
+    artifact: log
