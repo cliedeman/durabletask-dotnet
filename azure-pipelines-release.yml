@@ -22,6 +22,10 @@ variables:
   ${{ if parameters.binlog }}:
     build_binlog: -bl:$(log_dir)/build.binlog
     pack_binlog: -bl:$(log_dir)/pack.binlog
+  ${{ else }}:
+    # have to explicitly set these to resolve to null, otherwise their usage becomes a literal of '$(variable)'
+    build_binlog:
+    pack_binlog:
 
 steps:
 - checkout: self
